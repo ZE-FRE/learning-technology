@@ -1,0 +1,43 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "expression": {
+            "field": "zh_name",
+            "operator": "ENDS_WITH",
+            "value": "员工"
+          }
+        },
+        {
+          "conjunction": "OR",
+          "children": [
+            {
+              "expression": {
+                "field": "en_name",
+                "operator": "EQ",
+                "value": "vip_price"
+              }
+            },
+            {
+              "conjunction": "AND",
+              "expression": {
+                "field": "field_length",
+                "operator": "IN",
+                "value": [60,80]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conjunction": "AND",
+      "expression": {
+        "field": "data_element_id",
+        "operator": "EQ",
+        "value": 4
+      }
+    }
+  ]
+}

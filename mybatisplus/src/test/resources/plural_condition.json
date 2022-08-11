@@ -1,0 +1,19 @@
+{
+  "children": [
+    {
+      "expression": {
+        "operator": "EQ",
+        "field": "staff_name",
+        "value": "嘿嘿嘿"
+      }
+    },
+    {
+      "conjunction": "AND",
+      "expression": {
+        "operator": "EQ",
+        "field": "staff_id",
+        "value": "1"
+      }
+    }
+  ]
+}

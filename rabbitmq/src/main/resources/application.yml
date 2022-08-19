@@ -1,0 +1,21 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: rabbitmq
+  rabbitmq:
+    #host、port、username、password项目需要根据实际部署情况填写，其它默认即可
+    host: 192.168.111.222
+    port: 5672
+    virtual-host: zefre
+    username: rivamed
+    password: rivamed
+    publisher-returns: true
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 1
+          initial-interval: 2000
+        default-requeue-rejected: false

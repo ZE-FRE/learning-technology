@@ -3,7 +3,6 @@ package cn.zefre.validation.spring.service;
 import cn.zefre.validation.BootApplication;
 import cn.zefre.validation.spring.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +13,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author pujian
@@ -49,28 +51,23 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateNameById() {
-        try {
-            userService.updateNameById("", null);
-        } catch (Exception e) {
-            Assert.assertSame(ConstraintViolationException.class, e.getClass());
-        }
+        ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () -> userService.updateNameById("", null));
+        ConstraintViolation<?> violation = exception.getConstraintViolations().iterator().next();
+        assertEquals("id不能为空", violation.getMessage());
     }
 
     @Test
     public void testGetById() {
-        try {
-            userService.getById("1");
-        } catch (Exception e) {
-            Assert.assertSame(ConstraintViolationException.class, e.getClass());
-        }
+        ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () -> userService.getById("1"));
+        ConstraintViolation<?> violation = exception.getConstraintViolations().iterator().next();
+        assertEquals("id不能为空", violation.getMessage());
     }
 
     @Test
     public void testInsert() {
-        try {
-            userService.insert(new UserDto());
-        } catch (Exception e) {
-            Assert.assertSame(ConstraintViolationException.class, e.getClass());
-        }
+        ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () -> userService.insert(new UserDto()));
+        ConstraintViolation<?> violation = exception.getConstraintViolations().iterator().next();
+        assertEquals("id不能为空", violation.getMessage());
     }
+
 }

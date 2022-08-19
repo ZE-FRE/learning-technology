@@ -11,6 +11,7 @@
         <module>redis</module>
         <module>validation</module>
         <module>mybatisplus</module>
+        <module>rabbitmq</module>
     </modules>
     <packaging>pom</packaging>
 

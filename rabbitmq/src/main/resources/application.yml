@@ -3,13 +3,18 @@ server:
 spring:
   application:
     name: rabbitmq
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/rabbitmq?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2b8
+    username: root
+    password: 6248
   rabbitmq:
-    #host、port、username、password项目需要根据实际部署情况填写，其它默认即可
-    host: 192.168.111.222
+    # host、port、username、password项目需要根据实际部署情况填写，其它默认即可
+    host: 192.168.142.10
     port: 5672
-    virtual-host: zefre
-    username: rivamed
-    password: rivamed
+    # virtual-host: zefre
+    username: admin
+    password: admin
     publisher-returns: true
     publisher-confirm-type: correlated
     listener:

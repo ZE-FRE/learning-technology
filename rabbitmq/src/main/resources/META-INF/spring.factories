@@ -1,2 +1,0 @@
-cn.zefre.rabbitmq.idempotence.service.IdempotenceService=  cn.zefre.rabbitmq.idempotence.service.RedisIdempotenceService,\
-  cn.zefre.rabbitmq.idempotence.service.MysqlIdempotenceService

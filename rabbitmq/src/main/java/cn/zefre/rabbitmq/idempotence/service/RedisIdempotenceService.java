@@ -1,6 +1,8 @@
 package cn.zefre.rabbitmq.idempotence.service;
 
 /**
+ * 基于Redis提供幂等性服务
+ *
  * @author pujian
  * @date 2022/9/16 22:12
  */

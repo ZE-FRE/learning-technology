@@ -1,6 +1,7 @@
 package cn.zefre.rabbitmq.idempotence.annotation;
 
-import cn.zefre.rabbitmq.idempotence.RabbitIdempotenceAutoConfiguration;
+import cn.zefre.rabbitmq.idempotence.RabbitIdempotenceRegistrar;
+import cn.zefre.rabbitmq.idempotence.service.IdempotenceService;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -16,6 +17,12 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import(RabbitIdempotenceAutoConfiguration.class)
+@Import(RabbitIdempotenceRegistrar.class)
 public @interface EnableRabbitIdempotence {
+
+    /**
+     * 幂等性服务提供者
+     */
+    Class<? extends IdempotenceService> serviceProvider();
+
 }

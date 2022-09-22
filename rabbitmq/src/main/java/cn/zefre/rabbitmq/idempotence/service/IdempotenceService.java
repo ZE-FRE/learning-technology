@@ -1,11 +1,16 @@
 package cn.zefre.rabbitmq.idempotence.service;
 
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
 /**
  * 幂等性Service
  *
  * @author pujian
  * @date 2022/9/16 20:50
  */
+@Validated
 public interface IdempotenceService {
 
     /**
@@ -16,7 +21,7 @@ public interface IdempotenceService {
      * @author pujian
      * @date 2022/9/16 22:16
      */
-    boolean exists(String uniqueId);
+    boolean exists(@NotEmpty(message = "幂等性唯一id不能为空") String uniqueId);
 
     /**
      * 保存唯一id
@@ -25,6 +30,6 @@ public interface IdempotenceService {
      * @author pujian
      * @date 2022/9/17 21:33
      */
-    void persist(String uniqueId);
+    void persist(@NotEmpty(message = "幂等性唯一id不能为空") String uniqueId);
 
 }

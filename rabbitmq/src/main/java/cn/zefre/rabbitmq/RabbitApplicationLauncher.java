@@ -10,11 +10,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author pujian
  * @date 2022/8/12 16:14
  */
-@SpringBootApplication(scanBasePackages = {"cn.zefre"})
-@MapperScan({"cn.zefre.rabbitmq.mapper", "cn.zefre.mybatisplus.crud.mapper"})
+@SpringBootApplication
+@MapperScan("cn.zefre.rabbitmq.mapper")
 @EnableRabbitIdempotence(serviceProvider = RedisIdempotenceService.class)
-public class BootApplication {
+public class RabbitApplicationLauncher {
     public static void main(String[] args) {
-        SpringApplication.run(BootApplication.class);
+        SpringApplication.run(RabbitApplicationLauncher.class);
     }
 }

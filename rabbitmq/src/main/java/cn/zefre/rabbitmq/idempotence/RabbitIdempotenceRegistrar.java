@@ -21,6 +21,9 @@ import org.springframework.util.Assert;
 @Slf4j
 public class RabbitIdempotenceRegistrar implements ImportBeanDefinitionRegistrar {
 
+    /**
+     * 幂等性服务提供者bean name
+     */
     public static final String RABBIT_IDEMPOTENCE_SERVICE_BEAN_NAME = "idempotenceService";
 
     @Override
@@ -34,6 +37,7 @@ public class RabbitIdempotenceRegistrar implements ImportBeanDefinitionRegistrar
         if (!registry.containsBeanDefinition(RABBIT_IDEMPOTENCE_SERVICE_BEAN_NAME)) {
             log.info("rabbitmq幂等性服务提供者是：{}", serviceProvider.getName());
             BeanDefinition serviceDefinition = BeanDefinitionBuilder.genericBeanDefinition(serviceProvider).getBeanDefinition();
+            serviceDefinition.setPrimary(true);
             registry.registerBeanDefinition(RABBIT_IDEMPOTENCE_SERVICE_BEAN_NAME, serviceDefinition);
         }
 

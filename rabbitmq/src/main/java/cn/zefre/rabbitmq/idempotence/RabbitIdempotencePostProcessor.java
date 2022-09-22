@@ -4,6 +4,7 @@ import cn.zefre.rabbitmq.idempotence.annotation.RabbitIdempotence;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.autoproxy.AbstractBeanFactoryAwareAdvisingPostProcessor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
@@ -17,11 +18,15 @@ import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 保障rabbitmq幂等性的后置处理器
@@ -44,14 +49,21 @@ public class RabbitIdempotencePostProcessor extends AbstractBeanFactoryAwareAdvi
      */
     private final AcknowledgeMode simpleAckMode;
     /**
-     * 幂等性处理拦截器
+     * 切入点
+     */
+    private Pointcut pointcut = new IdempotentPointcut();
+    /**
+     * 幂等性方法通知
      */
     private IdempotenceMethodInterceptor methodInterceptor;
 
-    public RabbitIdempotencePostProcessor(RabbitProperties rabbitProperties, IdempotenceMethodInterceptor methodInterceptor) {
+
+    public RabbitIdempotencePostProcessor(Environment environment, RabbitProperties rabbitProperties, IdempotenceMethodInterceptor methodInterceptor) {
         log.info("实例化rabbitmq幂等性后置处理器：{}", RabbitIdempotencePostProcessor.class.getName());
         this.simpleAckMode = rabbitProperties.getListener().getSimple().getAcknowledgeMode();
         this.methodInterceptor = methodInterceptor;
+        boolean proxyTargetClass = environment.getProperty("spring.aop.proxy-target-class", Boolean.class, true);
+        this.setProxyTargetClass(proxyTargetClass);
     }
 
     @Override
@@ -66,8 +78,7 @@ public class RabbitIdempotencePostProcessor extends AbstractBeanFactoryAwareAdvi
 
     @Override
     public void afterPropertiesSet() {
-        IdempotentPointcut pointcut = new IdempotentPointcut();
-        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, this.methodInterceptor);
+        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(this.pointcut, this.methodInterceptor);
         advisor.setOrder(Ordered.LOWEST_PRECEDENCE);
         this.advisor = advisor;
     }
@@ -79,16 +90,24 @@ public class RabbitIdempotencePostProcessor extends AbstractBeanFactoryAwareAdvi
             ReflectionUtils.doWithMethods(targetClass, method -> {
                 // 获取方法上所有关联的注解
                 MergedAnnotations annotations = MergedAnnotations.from(method, MergedAnnotations.SearchStrategy.TYPE_HIERARCHY);
+                // 将rabbitmq幂等性方法缓存起来
                 if (annotations.isPresent(RabbitIdempotence.class) && annotations.isPresent(RabbitListener.class)) {
                     log.debug("扫描到rabbitmq幂等性方法：" + method);
-                    // 看方法上是否有标记手动ACK
-                    boolean manualAck = annotations.stream(RabbitListener.class)
+                    // 取得方法上的ack模式
+                    List<AcknowledgeMode> ackModeList = annotations.stream(RabbitListener.class)
                             .map(MergedAnnotation::synthesize)
                             .map(RabbitListener::ackMode)
                             .map(this::resolveAckMode)
-                            .anyMatch(AcknowledgeMode.MANUAL::equals);
-                    // 得到该方法的ack模式
-                    AcknowledgeMode ackMode = manualAck ? AcknowledgeMode.MANUAL : this.simpleAckMode;
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    AcknowledgeMode ackMode = null;
+                    if (!ackModeList.isEmpty()) {
+                        ackMode = ackModeList.contains(AcknowledgeMode.MANUAL) ? AcknowledgeMode.MANUAL : ackModeList.get(0);
+                    }
+                    // 方法上没有指定ack模式，取配置中的值
+                    if (ackMode == null) {
+                        ackMode = this.simpleAckMode;
+                    }
                     RabbitIdempotence rabbitIdempotence = annotations.stream(RabbitIdempotence.class).map(MergedAnnotation::synthesize).findFirst().orElse(null);
                     methodInterceptor.addEligibleMethod(method, new IdempotenceMethodMetadata(method, ackMode, rabbitIdempotence));
                 }

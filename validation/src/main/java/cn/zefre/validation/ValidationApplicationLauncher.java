@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @date 2021/10/19 16:39
  */
 @SpringBootApplication(scanBasePackages = {"cn.zefre"})
-public class BootApplication {
+public class ValidationApplicationLauncher {
 
     public static void main(String[] args) {
-        SpringApplication.run(BootApplication.class);
+        SpringApplication.run(ValidationApplicationLauncher.class);
     }
 }

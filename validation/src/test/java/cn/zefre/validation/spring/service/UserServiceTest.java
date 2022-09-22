@@ -1,6 +1,6 @@
 package cn.zefre.validation.spring.service;
 
-import cn.zefre.validation.BootApplication;
+import cn.zefre.validation.ValidationApplicationLauncher;
 import cn.zefre.validation.spring.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BootApplication.class)
+@SpringBootTest(classes = ValidationApplicationLauncher.class)
 public class UserServiceTest {
 
     @Resource

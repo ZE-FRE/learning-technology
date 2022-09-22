@@ -8,11 +8,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author pujian
  * @date 2021/10/19 16:39
  */
-@SpringBootApplication(scanBasePackages = {"cn.zefre"})
+@SpringBootApplication
 @MapperScan("cn.zefre.**.mapper")
-public class BootApplication {
+public class MybatisApplicationLauncher {
 
     public static void main(String[] args) {
-        SpringApplication.run(BootApplication.class);
+        SpringApplication.run(MybatisApplicationLauncher.class);
     }
 }

@@ -1,17 +1,12 @@
 package cn.zefre.rabbitmq.idempotence.service;
 
-import cn.zefre.mybatisplus.crud.Expression;
-import cn.zefre.mybatisplus.crud.ExpressionUtil;
-import cn.zefre.mybatisplus.crud.SqlOperator;
-import cn.zefre.mybatisplus.crud.mapper.GenericMapper;
-import cn.zefre.mybatisplus.crud.sql.InsertSqlBuilder;
-import cn.zefre.mybatisplus.crud.sql.SelectSqlBuilder;
-import cn.zefre.mybatisplus.crud.where.AtomicWhere;
-import cn.zefre.mybatisplus.crud.where.Where;
+import cn.zefre.rabbitmq.entity.MqIdempotenceMessage;
+import cn.zefre.rabbitmq.mapper.MqIdempotenceMessageMapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.time.LocalDateTime;
 
 /**
  * 基于Mysql提供幂等性服务
@@ -19,31 +14,35 @@ import java.util.*;
  * @author pujian
  * @date 2022/9/17 19:03
  */
-public class MysqlIdempotenceService implements IdempotenceService {
-
-    @Resource
-    private GenericMapper genericMapper;
+public class MysqlIdempotenceService extends ServiceImpl<MqIdempotenceMessageMapper, MqIdempotenceMessage> implements IdempotenceService {
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean exists(String uniqueId) {
-        Where where = new AtomicWhere(null, new Expression("message_id", SqlOperator.EQ, uniqueId));
-        String sql = new SelectSqlBuilder("t_idempotence", Collections.singletonList("count(message_id) AS count"), where).build();
-        Map<String, Object> whereMap = ExpressionUtil.getWhereMap(where);
-        Map<String, Object> result = genericMapper.selectOne(sql, whereMap);
-        Object count = result.get("count");
-        return (Long) count != 0;
+        return lambdaQuery().eq(MqIdempotenceMessage::getMessageId, uniqueId).exists();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void persist(String uniqueId) {
-        List<Map<String, Object>> values = new ArrayList<>();
-        Map<String, Object> value = new HashMap<>();
-        value.put("message_id", uniqueId);
-        values.add(value);
-        String sql = new InsertSqlBuilder("t_idempotence", Collections.singletonList("message_id"), values.size()).build();
-        genericMapper.insert(sql, values);
+        MqIdempotenceMessage mqIdempotenceMessage = new MqIdempotenceMessage().setMessageId(uniqueId).setCreateTime(LocalDateTime.now());
+        save(mqIdempotenceMessage);
+    }
+
+
+
+    /**
+     * 定时任务：每个月1号凌晨1点执行
+     * 删除上个月之前的数据，最多保留两个月的数据(上个月和本月)
+     *
+     * @author pujian
+     * @date 2022/9/19 13:40
+     */
+    //@Scheduled(cron = "0 0 1 1 * ?")
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteRedundantData() {
+        // 取得前一个月的时间
+        LocalDateTime priorMonth = LocalDateTime.now().minusMonths(1);
+        lambdaUpdate().lt(MqIdempotenceMessage::getCreateTime, priorMonth).remove();
     }
 
 }

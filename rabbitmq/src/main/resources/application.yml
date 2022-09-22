@@ -19,8 +19,22 @@ spring:
     publisher-confirm-type: correlated
     listener:
       simple:
-        retry:
-          enabled: true
-          max-attempts: 1
-          initial-interval: 2000
+        # auto表示由spring进行ack/nack管理：
+        # 消费者未抛出异常时，spring会向mq进行ack应答；
+        # 消费者抛出异常时，若开启了消费者重试机制，则会进行重试(期间不会处理队列中的其他消息)
+        # 当达到最大重试次数仍报错时，若该队列配置了死信队列，会将消息转发到死信队列，否则该消息会被丢弃
+        acknowledge-mode: auto
+        retry: # 消费重试配置
+          # 重试会导致消费者线程在重试阶段，不会处理队列的其他消息，消费者吞吐量会受影响，尽量不要重试太久。
+          # 如果不需要消费者重试可以关闭这项功能
+          enabled: true # 开启消费重试机制
+          max-attempts: 2 # 最大重试次数
+          initial-interval: 1000 # 重试初始间隔时间
+          max-interval: 10000 # 重试最大间隔时间
+          #multiplier: 10 # 间隔时间乘子，间隔时间*乘子=下一次的间隔时间，最大不能超过设置的最大间隔时间
         default-requeue-rejected: false
+mybatis-plus:
+  mapper-locations: classpath*:/cn/zefre/**/mapper/xml/*Mapper.xml
+  configuration:
+    log-impl: cn.zefre.mybatisplus.config.SqlLogImpl
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler

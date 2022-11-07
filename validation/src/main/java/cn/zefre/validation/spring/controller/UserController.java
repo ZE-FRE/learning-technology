@@ -1,5 +1,6 @@
 package cn.zefre.validation.spring.controller;
 
+import cn.zefre.base.web.annotation.WrapResponse;
 import cn.zefre.base.web.response.UniformResponse;
 
 import cn.zefre.validation.spring.dto.UserDto;
@@ -16,9 +17,10 @@ import javax.validation.constraints.NotBlank;
  * @date 2021/10/19 15:37
  */
 @Slf4j
-@RestController("myUserController")
-@RequestMapping("/user")
 @Validated
+@WrapResponse
+@RequestMapping("/validation/user")
+@RestController("validationUserController")
 public class UserController {
 
     @GetMapping(value = "/{id}")

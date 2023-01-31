@@ -12,6 +12,7 @@
         <module>validation</module>
         <module>mybatisplus</module>
         <module>rabbitmq</module>
+        <module>common</module>
     </modules>
     <packaging>pom</packaging>
 

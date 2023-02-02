@@ -1,6 +1,5 @@
-package cn.zefre.common.conversion.mvc;
+package cn.zefre.common.conversion.converter;
 
-import cn.zefre.common.conversion.ConversionConstant;
 import cn.zefre.common.conversion.annotation.IntegerCurrency;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
@@ -18,6 +17,8 @@ import java.util.Set;
  */
 public class StringToIntegerCurrencyConverter implements ConditionalGenericConverter {
 
+    private BigDecimalToIntegerCurrencyConverter delegate = new BigDecimalToIntegerCurrencyConverter();
+
     @Override
     public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
         return sourceType.getType() == String.class && targetType.hasAnnotation(IntegerCurrency.class);
@@ -30,7 +31,7 @@ public class StringToIntegerCurrencyConverter implements ConditionalGenericConve
 
     @Override
     public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-        return new BigDecimal(source.toString()).multiply(ConversionConstant.ONE_HUNDRED).intValue();
+        return delegate.convert(new BigDecimal(source.toString()));
     }
 
 }

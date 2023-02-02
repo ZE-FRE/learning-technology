@@ -1,7 +1,7 @@
 package cn.zefre.common.conversion;
 
 import cn.zefre.common.conversion.annotation.IntegerCurrency;
-import cn.zefre.common.conversion.mvc.StringToIntegerCurrencyConverter;
+import cn.zefre.common.conversion.converter.StringToIntegerCurrencyConverter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

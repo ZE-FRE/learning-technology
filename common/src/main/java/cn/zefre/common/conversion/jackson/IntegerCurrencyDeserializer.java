@@ -1,8 +1,10 @@
 package cn.zefre.common.conversion.jackson;
 
-import cn.zefre.common.conversion.ConversionConstant;
+import cn.zefre.common.conversion.converter.BigDecimalToIntegerCurrencyConverter;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
@@ -17,9 +19,23 @@ import java.math.BigDecimal;
  */
 public class IntegerCurrencyDeserializer extends JsonDeserializer<Integer> {
 
+    private BigDecimalToIntegerCurrencyConverter delegate = new BigDecimalToIntegerCurrencyConverter();
+
     @Override
-    public Integer deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        return new BigDecimal(p.getValueAsString()).multiply(ConversionConstant.ONE_HUNDRED).intValue();
+    public Integer deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        BigDecimal money;
+        JsonToken currentToken = jsonParser.currentToken();
+        if (currentToken == JsonToken.VALUE_NUMBER_INT) {
+            money = new BigDecimal(jsonParser.getIntValue());
+        } else if (currentToken == JsonToken.VALUE_NUMBER_FLOAT) {
+            money = jsonParser.getDecimalValue();
+        } else if (currentToken == JsonToken.VALUE_STRING) {
+            // 如果是字符串，尝试转换为BigDecimal
+            money = new BigDecimal(jsonParser.getText());
+        } else {
+            throw new JsonParseException(jsonParser, "无法将" + currentToken + "类型的值反序列化到" + BigDecimal.class);
+        }
+        return delegate.convert(money);
     }
 
 }

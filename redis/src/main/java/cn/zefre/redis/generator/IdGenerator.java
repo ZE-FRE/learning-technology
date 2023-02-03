@@ -1,4 +1,4 @@
-package cn.zefre.redis.config;
+package cn.zefre.redis.generator;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;

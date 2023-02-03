@@ -3,7 +3,6 @@ package cn.zefre.common.conversion;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,7 +23,6 @@ import java.util.Date;
  * @date 2023/1/30 16:14
  */
 @WebMvcTest(controllers = DateFormatTest.DateConfig.TestController.class)
-@AutoConfigureMockMvc
 public class DateFormatTest {
 
     @Resource

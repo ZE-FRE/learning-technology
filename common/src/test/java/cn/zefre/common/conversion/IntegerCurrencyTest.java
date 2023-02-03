@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author pujian
  * @date 2023/1/29 17:51
  */
-@WebMvcTest
+@WebMvcTest(controllers = IntegerCurrencyTest.Config.TestController.class)
 public class IntegerCurrencyTest {
 
     @Resource
@@ -36,7 +37,7 @@ public class IntegerCurrencyTest {
 
 
     @Configuration
-    public static class Config {
+    static class Config {
 
         @RestController
         static class TestController {
@@ -51,7 +52,7 @@ public class IntegerCurrencyTest {
             }
         }
 
-        @Configuration
+        @TestConfiguration
         static class CustomConverterWebConfiguration implements WebMvcConfigurer {
             @Override
             public void addFormatters(FormatterRegistry registry) {

@@ -13,6 +13,7 @@
         <module>mybatisplus</module>
         <module>rabbitmq</module>
         <module>common</module>
+        <module>retry</module>
     </modules>
     <packaging>pom</packaging>
 
